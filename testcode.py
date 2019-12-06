@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-import datetime 
+#import datetime
 import requests
 import json
 from threading import Timer
@@ -32,7 +32,7 @@ def jprint(obj):
 	weather_descript = current_json['weather_descriptions']
 	for w in range(len(weather_descript)):
 		print("Weather descriptions "+weather_descript[w]) #Weather Descriptions
-		show_message(device, "Current status "+weather_descript[w], fill="white", font=proportional(LCD_FONT), scroll_delay=0.08)
+		show_message(device, weather_descript[w], fill="white", font=proportional(LCD_FONT), scroll_delay=0.08)
 
 serial = spi(port=0, device=0, gpio=noop())
 device = max7219(serial, width=32, height=8, block_orientation=-90)
@@ -47,15 +47,14 @@ payload = {
 	'query' : 'Bochum'
 }
 
-now = datetime.now()
-start_min = now.minute
-
-while(True):
-	now_update = datetime.now()
-	current_min = now.minute
+counter = 0
 	
-	if(start_min == current_min):
+while(True):
+	now = datetime.now()
+	current_min = now.minute
+	if current_min == 14 or counter == 0: #Change start minute like you want. Here is 14er minute
 		response = requests.get(URL, params=payload)
+		counter+=1
 		
 	if response.status_code == 404:
 		print("Not OK!");
