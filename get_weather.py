@@ -1,8 +1,7 @@
 import RPi.GPIO as GPIO
 import requests
 import json
-from threading import Timer
-from time import sleep, strftime
+#from time import sleep, strftime
 from datetime import datetime
 
 from luma.core.interface.serial import spi, noop
@@ -13,7 +12,10 @@ from luma.core.legacy import text, show_message
 from luma.core.legacy.font import proportional, CP437_FONT, LCD_FONT
 
 
-def jprint(obj):
+def jprint(obj, error, error_name):
+	if error:
+		print("Error: "+str(error_name)+"...")
+		show_message(device, "Error: "+str(error_name)+"...", fill="white", font=proportional(LCD_FONT), scroll_delay=0.08)
 	text = json.dumps(obj, sort_keys=True, indent=4)
 	# print(text)
 	weather_json = json.loads(text)
@@ -51,15 +53,21 @@ run_counter = 0
 while(True):
 	now = datetime.now()
 	current_min = now.minute
-	if current_min == 0 or run_counter == 0: #Change start minute like you want. Here is 0er minute
+	
+	if current_min == 0 or run_counter == 0: #Change start minute like you want. Here is 30er minute
 		response = requests.get(URL, params=payload)
 		run_counter+=1
 		print(">>>>>>>>>>>Run "+str(run_counter)+"er time.<<<<<<<<<<<<")
 		
 	if response.status_code == 404:
 		print("Not OK!");
+		error = True 
+		jprint(response.json(), error, response.status_code)
 	elif response.status_code == 200:
 		print("OK. Get data successful...")
-		jprint(response.json())
+		error = False
+		jprint(response.json(), error, response.status_code)
 	else:
 		print("Error "+str(response.status_code))
+		error = True 
+		jprint(response.json(), error, response.status_code)
