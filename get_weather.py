@@ -43,7 +43,7 @@ virtual = viewport(device, width=32, height=16)
 URL = "http://api.weatherstack.com/current"
 
 payload = {
-	'access_key' : '47e06e2896d490f88071cb6e0668ce55',
+	'access_key' : 'xxxxxxxxxxx',
 	'query' : 'Bochum'
 }
 
